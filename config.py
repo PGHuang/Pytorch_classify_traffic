@@ -86,8 +86,8 @@ class Config(ConfigBase):
     vis_nrows = 4
     freq_print = 10  # every batch
 
-    freq_val = 1  # every epoch
-    freq_save_pth = 1  # every epoch
+    freq_val = 10  # every epoch
+    freq_save_pth = 10  # every epoch
 
     ##########################################################################################
     #                                      transforms                                        #
