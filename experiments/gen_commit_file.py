@@ -62,6 +62,9 @@ class Predictor(object):
             anno_test_dict["annotations"] = result_list
             json.dump(anno_test_dict, w, indent="    ")
 
+        with open(self.cfg.path_save_json[:-5] + "_cfg.json", 'w') as f:
+            json.dump(self.cfg, f, indent="    ")
+
         print("* Generate", self.cfg.path_save_json.split("/")[-1], "Done!")
 
 
@@ -94,7 +97,7 @@ def main():
     cfg = edict()
     # model
     cfg.path_pth = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/checkpoints/" \
-                   "traffic_run01_baseline/checkpoints/epoch_0500.pth"
+                   "traffic_run01_baseline/checkpoints/epoch_0300.pth"
     cfg.model_arch = "resnet50"
     cfg.model_conf = get_model_config(cfg.model_arch)
 
