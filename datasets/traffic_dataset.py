@@ -112,7 +112,7 @@ def get_loader_train(batch_size, path_folder=cfg.path_train_folder, path_anno_tx
     datasets_train = TrafficDataset(path_folder, path_anno_txt, if_train=True)
     train_loader = DataLoader(
         datasets_train, batch_size=batch_size, shuffle=True,
-        num_workers=cfg.num_workers, pin_memory=cfg.pin_memory, drop_last=True
+        num_workers=cfg.num_workers, pin_memory=cfg.pin_memory, drop_last=False
     )
     return train_loader
 

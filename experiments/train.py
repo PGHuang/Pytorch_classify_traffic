@@ -123,6 +123,7 @@ class Trainer(object):
         """ Epoch_Loss """
         print("Epoch:%-5i" % epoch, "Epoch_Loss = %-5.5f" % train_epoch_loss)
         self.vis.line(win_name='train_epoch_loss', x=epoch, value=train_epoch_loss)
+
         """ Metric """
         eps = 1e-8
         precision_each = confusion_matrix.diag() / (confusion_matrix.sum(1) + eps)

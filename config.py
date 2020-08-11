@@ -60,27 +60,27 @@ class Config(ConfigBase):
     ##########################################################################################
     #                                   experiment setting                                   #
     ##########################################################################################
-    exp_name = "set00_run00_demo"
-    exp_description = "run pass the project"
+    exp_name = "traffic_run01_baseline"
+    exp_description = "resnet50, official_data"
 
     ##########################################################################################
     #                                         data                                           #
     ##########################################################################################
     data_description = "official data"
-    path_train_folder = "E:/TianChi/data/traffic/amap_traffic_train_0712/"
-    path_test_folder = "E:/TianChi/data/traffic/amap_traffic_test_0712/"
-    path_train_anno = "E:/TianChi/data/traffic/amap_traffic_annotations_train.json"
-    path_test_anno = "E:/TianChi/data/traffic/amap_traffic_annotations_test.json"
+    path_train_folder = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_train_0712/"
+    path_test_folder = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_test_0712/"
+    path_train_anno = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_annotations_train.json"
+    path_test_anno = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_annotations_test.json"
 
     ##########################################################################################
     #                                    hyper-parameters                                    #
     ##########################################################################################
-    path_project = "C:/Users/huangpg/Desktop/Pytorch_classify_traffic/"
+    path_project = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/"
 
     seed = 1
     gpus = [0]
-    epochs = 20
-    batch_size = 2
+    epochs = 500
+    batch_size = 16
 
     # 显示参数设置
     vis_nrows = 4
