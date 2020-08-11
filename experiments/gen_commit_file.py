@@ -106,7 +106,8 @@ def main():
     # path IMG and json
     cfg.path_test_annofile = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_annotations_test.json"
     cfg.path_folder_testdata = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_test_0712/"
-    cfg.path_save_json = "result_" + datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + ".json"
+    cfg.path_save_json = "/mnt/data1/huangpg/TianChi/traffic/commit_json/" + \
+                         "result_" + datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + ".json"
 
     ##############################################################
     #                          predictor                         #
