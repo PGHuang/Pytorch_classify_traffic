@@ -10,7 +10,7 @@ checkpoints/
 
 datasets/__pycache__/
 
-models/__pycache__/
+models/__pycache__/experiments/result_json/
 
 torchcv/metric/__pycache__/
 torchcv/optim_lrscheduler/__pycache__/torchcv/transforms/__pycache__/torchcv/utils_project/__pycache__/
