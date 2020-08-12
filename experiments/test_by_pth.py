@@ -14,7 +14,7 @@ from tqdm import tqdm
 from easydict import EasyDict as edict
 
 
-class Predictor(object):
+class Testor(object):
     def __init__(self, cfg):
         self.cfg = cfg
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -27,6 +27,17 @@ class Predictor(object):
         self.net.load_state_dict(state_dict)
         self.net = self.net.to(self.device)
         self.net.eval()
+
+        ################################################################################
+        #                            anno_                                  #
+        ################################################################################
+        anno_test_dict = json.load(open(self.cfg.path_test_annofile_labeled, "r"))
+        self.anno_list = anno_test_dict["annotations"]
+
+        ################################################################################
+        #                            confusion_matrix                                  #
+        ################################################################################
+        self.confusion_matrix = torch.zeros((3, 3)).to(self.device)
 
     def predict(self, path_img):
         ################################################################################
@@ -47,25 +58,14 @@ class Predictor(object):
         pre_cls = predicts_softmax.argmax(dim=-1)
         return pre_cls.item()
 
-    def gen_commit_json_file(self):
-        anno_test_dict = json.load(open(self.cfg.path_test_annofile, "r"))
-        anno_list = anno_test_dict["annotations"]
-        result_list = []
-        for item in tqdm(anno_list):
+    def compute_confusion_matrix(self):
+        for item in tqdm(self.anno_list):
+            # for item in self.anno_list:
             sample_id = item['id']
+            sample_label = item['status']
             path_img = self.cfg.path_folder_testdata + str(sample_id) + "/" + item['key_frame']
             res_cls = self.predict(path_img)
-            item['status'] = res_cls
-            result_list.append(item)
-
-        with open(self.cfg.path_save_json, "w", encoding="utf-8") as w:
-            anno_test_dict["annotations"] = result_list
-            json.dump(anno_test_dict, w, indent="    ")
-
-        with open(self.cfg.path_save_json[:-5] + "_cfg.json", 'w') as f:
-            json.dump(self.cfg, f, indent="    ")
-
-        print("* Generate", self.cfg.path_save_json.split("/")[-1], "Done!")
+            self.confusion_matrix[res_cls, sample_label] += 1
 
 
 def load_net(cfg):
@@ -107,9 +107,7 @@ def main():
     ##############################################################
     cfg = edict()
     # model
-    cfg.path_pth = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/checkpoints/" \
-                   "traffic_run03_resnet18_tv_woPretrain/checkpoints/epoch_0200.pth"
-    cfg.model_arch = "resnet18_tv_woPretrain"
+    cfg.model_arch = "resnet18_tv_pretrain"
     cfg.model_conf = get_model_config(cfg.model_arch)
 
     # transform
@@ -118,20 +116,38 @@ def main():
     cfg.std_rgb = [0.229, 0.224, 0.225]  # [0.229, 0.224, 0.225]
 
     # path IMG and json
-    cfg.path_test_annofile = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_annotations_test.json"
+    cfg.path_test_annofile_labeled = "/mnt/data1/huangpg/TianChi/traffic/commit_json/" \
+                                     "amap_traffic_annotations_test_labeled_v1.json"
     cfg.path_folder_testdata = "/mnt/data1/huangpg/TianChi/traffic/data/amap_traffic_test_0712/"
-    cfg.path_save_json = "/mnt/data1/huangpg/TianChi/traffic/commit_json/" + \
-                         "result_" + datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + ".json"
 
     ##############################################################
-    #                          predictor                         #
+    #                        compute F1_score                    #
     ##############################################################
-    predictor = Predictor(cfg)
+    path_folder_pth = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/checkpoints/" \
+                      "traffic_run02_resnet18_tv_pretrain/checkpoints/"
+    pth_files = os.listdir(path_folder_pth)
+    pth_files.sort(reverse=True)
+    for file in pth_files:
+        cfg.path_pth = path_folder_pth + file
 
-    ##############################################################
-    #                    gen json file to commit                 #
-    ##############################################################
-    predictor.gen_commit_json_file()
+        ##############################################################
+        #                            testor                          #
+        ##############################################################
+        testor = Testor(cfg)
+        testor.compute_confusion_matrix()
+        confusion_matrix = testor.confusion_matrix
+
+        """ metric """
+        eps = 1e-8
+        precision_each = confusion_matrix.diag() / (confusion_matrix.sum(1) + eps)
+        recall_each = confusion_matrix.diag() / (confusion_matrix.sum(0) + eps)
+        f1_each = 2 * precision_each * recall_each / (precision_each + recall_each + eps)
+
+        precision_mean = torch.mean(precision_each)
+        recall_mean = torch.mean(recall_each)
+        f1_score = 0.2 * f1_each[0] + 0.2 * f1_each[1] + 0.6 * f1_each[2]
+
+        print(file + ":  F1-Score =", f1_score.item())
 
 
 if __name__ == '__main__':
