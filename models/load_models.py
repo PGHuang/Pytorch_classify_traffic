@@ -15,6 +15,8 @@ def load_net(cfg):
         model = resnet50(**c.conf)
     elif c.arch == "resnet18_tv_pretrain":
         model = Resnet18_tv(**c.conf)
+    elif c.arch == "resnet18_tv_woPretrain":
+        model = Resnet18_tv(**c.conf)
     else:
         logging.critical(f"Model type {c.arch} not defined!")
         sys.exit()
@@ -29,6 +31,6 @@ if __name__ == '__main__':
     net = load_net(cfg)
     inp = torch.randn(4, 3, 360, 640)
     oup = net(inp)
-    print(oup.shape)
 
     stat(net, (3, 360, 640))
+    print(oup.shape)

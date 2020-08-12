@@ -13,6 +13,9 @@ def get_model_config(arch):
     elif arch == "resnet18_tv_pretrain":
         conf.num_classes = 3
         conf.if_pretrained = True
+    elif arch == "resnet18_tv_woPretrain":
+        conf.num_classes = 3
+        conf.if_pretrained = False
     else:
         logging.critical(f"Model type {arch} not defined!")
         sys.exit()
@@ -63,8 +66,8 @@ class Config(ConfigBase):
     ##########################################################################################
     #                                   experiment setting                                   #
     ##########################################################################################
-    exp_name = "traffic_run02_resnet18_tv_pretrain"
-    exp_description = "resnet18_tv_pretrain, official_data"
+    exp_name = "traffic_run03_resnet18_tv_woPretrain"
+    exp_description = "resnet18_tv_woPretrain, official_data"
 
     ##########################################################################################
     #                                         data                                           #
@@ -81,7 +84,7 @@ class Config(ConfigBase):
     path_project = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/"
 
     seed = 1
-    gpus = [0]
+    gpus = [1]
     epochs = 200
     batch_size = 16
 
@@ -114,7 +117,7 @@ class Config(ConfigBase):
     #                                           model                                        #
     ##########################################################################################
     model = edict()
-    model.arch = "resnet18_tv_pretrain"
+    model.arch = "resnet18_tv_woPretrain"
     model.conf = get_model_config(model.arch)
     model.finetune_weight = None
 
