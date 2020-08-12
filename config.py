@@ -10,6 +10,9 @@ def get_model_config(arch):
     conf = edict()
     if arch == "resnet50":
         conf.num_classes = 3
+    elif arch == "resnet18_tv_pretrain":
+        conf.num_classes = 3
+        conf.if_pretrained = True
     else:
         logging.critical(f"Model type {arch} not defined!")
         sys.exit()
@@ -60,8 +63,8 @@ class Config(ConfigBase):
     ##########################################################################################
     #                                   experiment setting                                   #
     ##########################################################################################
-    exp_name = "traffic_run01_baseline"
-    exp_description = "resnet50, official_data"
+    exp_name = "traffic_run02_resnet18_tv_pretrain"
+    exp_description = "resnet18_tv_pretrain, official_data"
 
     ##########################################################################################
     #                                         data                                           #
@@ -79,14 +82,14 @@ class Config(ConfigBase):
 
     seed = 1
     gpus = [0]
-    epochs = 500
+    epochs = 200
     batch_size = 16
 
     # 显示参数设置
     vis_nrows = 4
     freq_print = 10  # every batch
 
-    freq_val = 10  # every epoch
+    freq_val = 1  # every epoch
     freq_save_pth = 10  # every epoch
 
     ##########################################################################################
@@ -94,15 +97,15 @@ class Config(ConfigBase):
     ##########################################################################################
     trans = edict()
     trans.inp_size = (360, 640)  # (h, w)
-    trans.mean_rgb = [0, 0, 0]
-    trans.std_rgb = [1, 1, 1]
+    trans.mean_rgb = [0.485, 0.456, 0.406]  # [0.485, 0.456, 0.406]
+    trans.std_rgb = [0.229, 0.224, 0.225]  # [0.229, 0.224, 0.225]
 
     # 训练集数据增强
-    trans.hflip_p = 0.5
-    trans.color_jitter_p = 0.01
-    trans.noise_p = 0.01
-    trans.blur_p = 0.01
-    trans.point_light_p = 0.01
+    trans.hflip_p = 0.0
+    trans.color_jitter_p = 0.15
+    trans.noise_p = 0.15
+    trans.blur_p = 0.10
+    trans.point_light_p = 0.00
 
     num_workers = 4
     pin_memory = True
@@ -111,7 +114,7 @@ class Config(ConfigBase):
     #                                           model                                        #
     ##########################################################################################
     model = edict()
-    model.arch = "resnet50"
+    model.arch = "resnet18_tv_pretrain"
     model.conf = get_model_config(model.arch)
     model.finetune_weight = None
 
@@ -120,7 +123,7 @@ class Config(ConfigBase):
     ##########################################################################################
     optimizer = edict()
     optimizer.type = "Adam"  # [Adam, SGD, Adadelta]
-    optimizer.init_lr = 0.002
+    optimizer.init_lr = 0.001
     optimizer.conf = get_optimizer_conf(optimizer.type)
 
     lr_scheduler = edict()

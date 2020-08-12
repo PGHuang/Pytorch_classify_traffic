@@ -5,6 +5,7 @@ import logging
 from torchstat import stat
 
 from models.resnet50 import resnet50
+from models.resnet18_tv import Resnet18_tv
 
 
 def load_net(cfg):
@@ -12,6 +13,8 @@ def load_net(cfg):
 
     if c.arch == "resnet50":
         model = resnet50(**c.conf)
+    elif c.arch == "resnet18_tv_pretrain":
+        model = Resnet18_tv(**c.conf)
     else:
         logging.critical(f"Model type {c.arch} not defined!")
         sys.exit()

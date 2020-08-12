@@ -13,10 +13,16 @@ def gen_vis_result_binary(img_tensor, mask_tensor, oup_tensor):
     return batch_merge
 
 
-def gen_res_compare(imgs_tensor, targets_tensor, predicts_tensor):
+def gen_res_compare(imgs_tensor, targets_tensor, predicts_tensor, mean, std):
+    # denormalize
+    std_tensor = torch.tensor(std).unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
+    mean_tensor = torch.tensor(mean).unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
+    imgs_tensor = imgs_tensor.detach().cpu() * std_tensor + mean_tensor
+
+    # tensor -> numpy
     predicts_tensor = predicts_tensor.softmax(dim=-1)
     pre_cls = predicts_tensor.argmax(dim=-1)
-    imgs_np = np.array(imgs_tensor.detach().cpu())
+    imgs_np = np.array(imgs_tensor)
     targets_np = np.array(targets_tensor.detach().cpu())
     predicts_np = np.array(pre_cls.detach().cpu())
     predicts_list_np = np.array(predicts_tensor.detach().cpu())

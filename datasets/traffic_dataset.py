@@ -74,7 +74,8 @@ class TrafficDataset(Dataset):
     def _train_aug(self, img_np):
         aug = albu.Compose([
             # resize
-            albu.Resize(height=cfg.trans.inp_size[0], width=cfg.trans.inp_size[1], p=1),
+            albu.Resize(height=cfg.trans.inp_size[0] + 32, width=cfg.trans.inp_size[1] + 32, p=1),
+            albu.RandomCrop(height=cfg.trans.inp_size[0], width=cfg.trans.inp_size[1], p=1),
 
             # h-flip
             albu.HorizontalFlip(p=cfg.trans.hflip_p),
@@ -161,7 +162,27 @@ def try_loader():
         # break
 
 
+def demo():
+    import torchvision
+
+    # check loader_train
+    loader_train = get_loader_train(4, path_folder=cfg.path_train_folder,
+                                    path_anno_txt=cfg.path_train_anno)
+    for batch_id, (imgs, status) in enumerate(loader_train):
+        print(imgs.shape)
+        std = torch.tensor(cfg.trans.std_rgb).unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
+        mean = torch.tensor(cfg.trans.mean_rgb).unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
+        # print(std.unsqueeze(0).unsqueeze(-1).unsqueeze(-1).shape)
+        imgs = imgs * std + mean
+
+        transforms.ToPILImage()(torchvision.utils.make_grid(imgs, nrow=2)).show()
+        # print(status)
+        break
+
+
 if __name__ == '__main__':
     # try_dataset()
 
-    try_loader()
+    # try_loader()
+
+    demo()

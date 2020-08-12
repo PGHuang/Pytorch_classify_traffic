@@ -117,7 +117,7 @@ class Trainer(object):
             """ 可视化训练过程 """
             if batch_id % self.cfg.freq_print == 0:
                 print("Epoch:%-7i" % epoch, "Batch_ID: %-5i" % batch_id, " loss = %-5.4f" % loss.item())
-                res_vis = gen_res_compare(images, targets, predicts)
+                res_vis = gen_res_compare(images, targets, predicts, self.cfg.trans.mean_rgb, self.cfg.trans.std_rgb)
                 self.vis.image(win_name='train_sample', imgs=res_vis, nrow=self.cfg.vis_nrows)
 
         """ Epoch_Loss """
@@ -136,9 +136,13 @@ class Trainer(object):
 
         print("Epoch:%-5i" % epoch, "precision_mean = %-3.3f" % precision_mean.item(),
               "   recall_mean = %-3.3f" % recall_mean.item(), "   f1_score = %-3.3f" % f1_score.item())
-        self.vis.line(win_name='train_metric', x=epoch, value={'precision_mean': precision_mean.item(),
-                                                               'recall_mean': recall_mean.item(),
-                                                               'f1_score': f1_score.item()})
+        self.vis.line(win_name='train_metric_pr', x=epoch, value={'precision_mean': precision_mean.item(),
+                                                                  'recall_mean': recall_mean.item()})
+
+        self.vis.line(win_name='train_metric_f1', x=epoch, value={'f1_class_0': f1_each[0].item(),
+                                                                  'f1_class_1': f1_each[1].item(),
+                                                                  'f1_class_2': f1_each[2].item(),
+                                                                  'f1_weight': f1_score.item(), })
 
     def _compute_loss(self, predict, target):
         loss_cross_entropy = self.criterion_cross_entropy(predict, target)
@@ -154,7 +158,8 @@ class Trainer(object):
 
                 """ visdom """
                 if if_first_batch:
-                    res_vis = gen_res_compare(images, targets, predicts)
+                    res_vis = gen_res_compare(images, targets, predicts,
+                                              self.cfg.trans.mean_rgb, self.cfg.trans.std_rgb)
                     self.vis.image(win_name='val_sample', imgs=res_vis, nrow=self.cfg.vis_nrows)
                     # save res_img
                     path_img_save = self.cfg.path_save_IMG + "val_epoch-%s.jpg" % (str(epoch).zfill(4))
