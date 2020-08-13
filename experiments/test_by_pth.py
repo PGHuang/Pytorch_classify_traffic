@@ -107,7 +107,7 @@ def main():
     ##############################################################
     cfg = edict()
     # model
-    cfg.model_arch = "resnet18_tv_pretrain"
+    cfg.model_arch = "resnet18_tv_woPretrain"
     cfg.model_conf = get_model_config(cfg.model_arch)
 
     # transform
@@ -124,7 +124,8 @@ def main():
     #                        compute F1_score                    #
     ##############################################################
     path_folder_pth = "/mnt/data1/huangpg/TianChi/traffic/Pytorch_classify_traffic/checkpoints/" \
-                      "traffic_run02_resnet18_tv_pretrain/checkpoints/"
+                      "traffic_run03_resnet18_tv_woPretrain/checkpoints/"
+    print(path_folder_pth.split("/")[-3])
     pth_files = os.listdir(path_folder_pth)
     pth_files.sort(reverse=True)
     for file in pth_files:
